@@ -1,0 +1,8 @@
+export { default as Home } from './home'
+export { default as About } from './about'
+export { default as Contact } from './contact'
+export { default as Login } from './login'
+export { default as Register } from './register'
+export { default as Products } from './products'
+export { default as Product } from './products/products'
+export { default as Post } from './post'
