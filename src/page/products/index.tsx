@@ -1,51 +1,21 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { products } from "../../data/products";
+import { useProduct } from "../../context/products/productContext";
+import { filterProducts } from "../../util/filterProducts";
 
 function Products() {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [sort, setSort] = useState("featured");
-  const [favorites, setFavorites] = useState<number[]>([]);
   const [cartCount, setCartCount] = useState(0);
+  const { state, dispatch } = useProduct();
+  const { products, search, category, sort } = state;
 
   const categories = [
     "All",
-    ...new Set(products.map((product) => product.category)),
+    ...new Set(state.products.map((product) => product.product_category.name)),
   ];
 
   const filteredProducts = useMemo(() => {
-    
-    const result = products.filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      const matchesCategory =
-        category === "All" || product.category === category;
-
-      return matchesSearch && matchesCategory;
-    });
-
-    switch (sort) {
-      case "price-low":
-        return result.sort((a, b) => a.price - b.price);
-      case "price-high":
-        return result.sort((a, b) => b.price - a.price);
-      case "rating":
-        return result.sort((a, b) => b.rating - a.rating);
-      default:
-        return result;
-    }
-  }, [search, category, sort]);
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) =>
-      prev.includes(id)
-        ? prev.filter((itemId) => itemId !== id)
-        : [...prev, id],
-    );
-  };
+    return filterProducts(products, search, category, sort);
+  }, [products, search, category, sort]);
 
   return (
     <main className="products-page">
@@ -103,15 +73,19 @@ function Products() {
             <input
               type="search"
               placeholder="Search products..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              value={state.search}
+              onChange={(event) =>
+                dispatch({ type: "SET_SEARCH", payload: event.target.value })
+              }
             />
           </label>
 
           <select
             aria-label="Filter by category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
+            value={state.category}
+            onChange={(event) =>
+              dispatch({ type: "SET_CATEGORY", payload: event.target.value })
+            }
           >
             {categories.map((item) => (
               <option key={item} value={item}>
@@ -122,13 +96,15 @@ function Products() {
 
           <select
             aria-label="Sort products"
-            value={sort}
-            onChange={(event) => setSort(event.target.value)}
+            value={state.sort}
+            onChange={(event) =>
+              dispatch({ type: "SET_SORT", payload: event.target.value })
+            }
           >
             <option value="featured">Featured</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
+            {/* <option value="rating">Top Rated</option> */}
           </select>
         </div>
 
@@ -136,13 +112,13 @@ function Products() {
           <p>
             Showing <strong>{filteredProducts.length}</strong> products
           </p>
-          <span>{favorites.length} saved favorites ♡</span>
+          <span>{state.favorite.length} saved favorites ♡</span>
         </div>
 
         {filteredProducts.length > 0 ? (
           <div className="products-grid">
             {filteredProducts.map((product, index) => {
-              const isFavorite = favorites.includes(product.id);
+              const isFavorite = state.favorite.includes(product.id);
 
               return (
                 <article className="product-card" key={product.id}>
@@ -168,7 +144,12 @@ function Products() {
                       className={`favorite-button ${
                         isFavorite ? "is-favorite" : ""
                       }`}
-                      onClick={() => toggleFavorite(product.id)}
+                      onClick={() =>
+                        dispatch({
+                          type: "TOGGLE_FAVORITE",
+                          payload: product.id,
+                        })
+                      }
                       aria-label={
                         isFavorite
                           ? "Remove from favorites"
@@ -181,7 +162,7 @@ function Products() {
 
                   <div className="product-card-body">
                     <span className="product-card-category">
-                      {product.category}
+                      {product.product_category.name}
                     </span>
 
                     <Link
@@ -193,13 +174,13 @@ function Products() {
 
                     <div className="product-card-rating">
                       <span>★</span>
-                      <strong>{product.rating}</strong>
-                      <small>({product.reviews})</small>
+                      <strong>{product.manufacturer}</strong>
+                      <small>({product.description})</small>
                     </div>
 
                     <div className="product-card-price">
                       <strong>${product.price.toFixed(2)}</strong>
-                      <del>${product.oldPrice.toFixed(2)}</del>
+                      <del>${product.price.toFixed(2)}</del>
                     </div>
 
                     <div className="product-card-actions">
@@ -233,8 +214,8 @@ function Products() {
             <button
               type="button"
               onClick={() => {
-                setSearch("");
-                setCategory("All");
+                dispatch({ type: "SET_SEARCH", payload: "" });
+                dispatch({ type: "SET_CATEGORY", payload: "All" });
               }}
             >
               Clear filters

@@ -1,18 +1,8 @@
+import type { IProductItem } from "../types/product";
 
-export interface ProductItem {
-    id: number;
-    name: string;
-    category: string;
-    price: number;
-    oldPrice: number;
-    rating: number;
-    reviews: number;
-    description: string;
-    image: string;
-    features: string[];
-}
 
-export const products: ProductItem[] = [
+
+export const products: IProductItem[] = [
     {
         id: 1,
         name: "Wireless Headphones",
@@ -128,3 +118,13 @@ export const products: ProductItem[] = [
         ],
     },
 ];
+
+
+export const fetchingData = async<T>(url: string): Promise<T> => {
+    const response = await fetch(url)
+    if (!response) {
+        throw new Error("Something went wrong!")
+    }
+    const data: T = await response.json()
+    return data
+}

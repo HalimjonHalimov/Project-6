@@ -10,10 +10,13 @@ import {
 } from "./page";
 import "./App.css";
 import MainLayout from "./layout";
+import { useTheme } from "./context/theme/themeContext";
 
 function App() {
+  const { state: theme } = useTheme();
+
   return (
-    <div className="app ">
+    <div className={`app ${theme === "dark" ? "dark-theme" : ""}`}>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />

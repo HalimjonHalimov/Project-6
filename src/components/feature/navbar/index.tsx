@@ -1,6 +1,8 @@
 import { NavLink } from "react-router";
+import { useTheme } from "../../../context/theme/themeContext";
 
 function Navbar() {
+  const { state, dispatch } = useTheme();
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar__logo">
@@ -33,9 +35,14 @@ function Navbar() {
         </NavLink>
 
         {/* Theme button */}
-        <button className="theme-button">
-          <span className="theme-button__icon">☀️</span>
-          <span className="theme-button__text">Light</span>
+        <button
+          className="theme-button"
+          onClick={() => dispatch({ type: "TOGGLE_THEME" })}
+        >
+          <span className="theme-button__icon">
+            {state === "light" ? "☀️" : "🌙"}
+          </span>
+          <span className="theme-button__text">{state}</span>
         </button>
       </div>
     </nav>
