@@ -173,8 +173,10 @@ function Products() {
                     </Link>
 
                     <div className="product-card-rating">
-                      <span>★</span>
-                      <strong>{product.manufacturer}</strong>
+                      <strong>
+                        <span> ★ </span>
+                        {product.manufacturer}
+                      </strong>
                       <small>({product.description})</small>
                     </div>
 

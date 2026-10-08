@@ -1,11 +1,12 @@
 import { useParams, Link } from "react-router";
-import { products } from "../../data/products";
-
+// import { products } from "../../data/products";
+import { useProduct } from "../../context/products/productContext";
 
 function Product() {
   const { id } = useParams();
+  const { state } = useProduct();
 
-  const product = products.find((item) => item.id === Number(id));
+  const product = state.products.find((item) => item.id === id);
 
   if (!product) {
     return (
@@ -39,14 +40,14 @@ function Product() {
         </div>
 
         <div className="product-info">
-          <span className="product-category">{product.category}</span>
+          <span className="product-category">{product.product_category.name}</span>
 
           <h1>{product.name}</h1>
 
           <div className="product-rating">
             <span className="rating-star">★</span>
-            <strong>{product.rating}</strong>
-            <span className="rating-reviews">({product.reviews} reviews)</span>
+            <strong>{product.name}</strong>
+            <span className="rating-reviews">({product.manufacturer} reviews)</span>
             <span className="product-stock">
               <span className="stock-dot" />
               In stock
@@ -55,9 +56,9 @@ function Product() {
 
           <div className="product-price">
             <strong>${product.price.toFixed(2)}</strong>
-            <del>${product.oldPrice.toFixed(2)}</del>
+            <del>${product.price.toFixed(2)}</del>
             <span className="product-discount">
-              {Math.round((1 - product.price / product.oldPrice) * 100)}% OFF
+              {Math.round((1 - product.price / product.price) * 100)}% OFF
             </span>
           </div>
 
@@ -67,14 +68,14 @@ function Product() {
 
           <h3>Product highlights</h3>
 
-          <ul className="product-features">
+          {/* <ul className="product-features">
             {product.features.map((feature) => (
               <li key={feature}>
                 <span className="feature-check">✓</span>
                 {feature}
               </li>
             ))}
-          </ul>
+          </ul> */}
 
           <div className="product-divider" />
 
